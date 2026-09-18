@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -36,4 +37,23 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_GATEWAY)
                 .body(errorResponse);
     }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiErrorResponse> handleValidationException(
+            MethodArgumentNotValidException exception
+    ) {
+        String message = exception
+                .getBindingResult()
+                .getFieldError()
+                .getDefaultMessage();
+
+        ApiErrorResponse errorResponse = new ApiErrorResponse(
+                "Validation failed",
+                message
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(errorResponse);
+    }
+
 }

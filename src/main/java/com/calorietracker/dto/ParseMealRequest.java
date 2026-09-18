@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 
 public class ParseMealRequest {
 
-    @NotBlank
+    @NotBlank(message = "Meal description cannot be empty")
     private String prompt;
 
     public ParseMealRequest(){

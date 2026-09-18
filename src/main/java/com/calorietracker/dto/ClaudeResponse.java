@@ -29,7 +29,7 @@ public class ClaudeResponse {
         public String getText(){
             return text;
         }
-        public void setText(){
+        public void setText(String text){
             this.text = text;
         }
     }
