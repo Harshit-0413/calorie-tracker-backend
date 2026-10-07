@@ -3,6 +3,7 @@ package com.calorietracker.controller;
 import com.calorietracker.dto.CreateMealRequest;
 import com.calorietracker.dto.MealFoodEntryResponse;
 import com.calorietracker.dto.MealResponse;
+import com.calorietracker.dto.TodayMealsResponse;
 import com.calorietracker.entity.MealFoodEntryEntity;
 import com.calorietracker.entity.MealLogEntity;
 import com.calorietracker.service.MealFoodEntryService;
@@ -48,6 +49,13 @@ public class MealController {
                 .toList();
     }
 
+    @GetMapping("/today/{uid}")
+    public TodayMealsResponse getTodayMeals(
+            @PathVariable String uid
+    ) {
+        return mealLogService.getTodayMeals(uid);
+    }
+
     private MealResponse toResponse(MealLogEntity meal) {
         return new MealResponse(
                 meal.getId(),
@@ -61,6 +69,7 @@ public class MealController {
                 meal.getUpdatedAt()
         );
     }
+
     @GetMapping("/{mealId}/entries")
     public List<MealFoodEntryResponse> getMealEntries(
             @PathVariable String mealId
@@ -71,10 +80,16 @@ public class MealController {
                 .toList();
     }
 
-    private MealFoodEntryResponse toFoodEntryResponse(MealFoodEntryEntity entry) {
+    private MealFoodEntryResponse toFoodEntryResponse(
+            MealFoodEntryEntity entry
+    ) {
+        String foodId = entry.getFood() == null
+                ? null
+                : entry.getFood().getId();
+
         return new MealFoodEntryResponse(
                 entry.getId(),
-                entry.getFood().getId(),
+                foodId,
                 entry.getFoodName(),
                 entry.getQuantity(),
                 entry.getQuantityUnit(),
@@ -83,7 +98,8 @@ public class MealController {
                 entry.getCarbs(),
                 entry.getFat(),
                 entry.getFiber(),
-                entry.getSugar()
+                entry.getSugar(),
+                entry.isEstimated()
         );
     }
 }

@@ -1,3 +1,4 @@
+
 package com.calorietracker.entity;
 
 import jakarta.persistence.Column;
@@ -22,8 +23,8 @@ public class MealFoodEntryEntity {
     @JoinColumn(name = "meal_id", nullable = false)
     private MealLogEntity meal;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "food_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "food_id", nullable = true)
     private FoodItemEntity food;
 
     @Column(name = "food_name", nullable = false)
@@ -53,6 +54,9 @@ public class MealFoodEntryEntity {
     @Column(nullable = false)
     private Double sugar;
 
+    @Column(name = "nutrition_estimated")
+    private Boolean estimated = false;
+
     protected MealFoodEntryEntity() {
     }
 
@@ -69,6 +73,26 @@ public class MealFoodEntryEntity {
             Double fiber,
             Double sugar
     ) {
+        this(
+                meal, food, foodName, quantity, quantityUnit,
+                calories, protein, carbs, fat, fiber, sugar, false
+        );
+    }
+
+    public MealFoodEntryEntity(
+            MealLogEntity meal,
+            FoodItemEntity food,
+            String foodName,
+            Double quantity,
+            String quantityUnit,
+            Double calories,
+            Double protein,
+            Double carbs,
+            Double fat,
+            Double fiber,
+            Double sugar,
+            boolean estimated
+    ) {
         this.meal = meal;
         this.food = food;
         this.foodName = foodName;
@@ -80,6 +104,7 @@ public class MealFoodEntryEntity {
         this.fat = fat;
         this.fiber = fiber;
         this.sugar = sugar;
+        this.estimated = estimated;
     }
 
     public Long getId() {
@@ -128,5 +153,9 @@ public class MealFoodEntryEntity {
 
     public Double getSugar() {
         return sugar;
+    }
+
+    public boolean isEstimated() {
+        return Boolean.TRUE.equals(estimated);
     }
 }

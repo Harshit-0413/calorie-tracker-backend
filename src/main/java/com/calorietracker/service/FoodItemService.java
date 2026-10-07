@@ -5,6 +5,8 @@ import com.calorietracker.entity.FoodItemEntity;
 import com.calorietracker.repository.FoodItemRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class FoodItemService {
 
@@ -49,5 +51,29 @@ public class FoodItemService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Food not found: " + foodId
                 ));
+    }
+    public FoodItemEntity findByName(String name) {
+        return foodItemRepository.findByNameIgnoreCase(name)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Food not found in catalog: " + name
+                ));
+    }
+    public FoodItemEntity findByNameOrAlias(String name) {
+        List<FoodItemEntity> matches =
+                foodItemRepository.findByNameOrAlias(name);
+
+        if (matches.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Food not found in catalog: " + name
+            );
+        }
+
+        if (matches.size() > 1) {
+            throw new IllegalArgumentException(
+                    "Multiple foods matched: " + name
+            );
+        }
+
+        return matches.get(0);
     }
 }

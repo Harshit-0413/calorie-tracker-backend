@@ -1,3 +1,4 @@
+
 package com.calorietracker.dto;
 
 import org.junit.jupiter.api.Test;
@@ -11,7 +12,10 @@ class MealAnalysisResponseTest {
     @Test
     void shouldReturnCorrectTotalsForOneMealItem() {
         MealAnalysisResponse response = new MealAnalysisResponse();
-        response.setItems(List.of(createMealItem("Poha", "2 plates", 450, 10, 70, 15, 6)));
+
+        response.setItems(List.of(
+                createMealItem("Poha", 2.0, "plates", 450, 10, 70, 15, 6)
+        ));
 
         assertEquals(450, response.getTotalCalories());
         assertEquals(10, response.getTotalProtein());
@@ -23,9 +27,10 @@ class MealAnalysisResponseTest {
     @Test
     void shouldReturnSummedTotalsForMultipleMealItems() {
         MealAnalysisResponse response = new MealAnalysisResponse();
+
         response.setItems(List.of(
-                createMealItem("Rice", "1 cup", 200, 4, 45, 1, 1),
-                createMealItem("Dal", "1 bowl", 150, 9, 20, 4, 5)
+                createMealItem("Rice", 1.0, "cup", 200, 4, 45, 1, 1),
+                createMealItem("Dal", 1.0, "bowl", 150, 9, 20, 4, 5)
         ));
 
         assertEquals(350, response.getTotalCalories());
@@ -38,6 +43,7 @@ class MealAnalysisResponseTest {
     @Test
     void shouldReturnZeroTotalsForEmptyItems() {
         MealAnalysisResponse response = new MealAnalysisResponse();
+
         response.setItems(List.of());
 
         assertEquals(0.0, response.getTotalCalories());
@@ -49,7 +55,8 @@ class MealAnalysisResponseTest {
 
     private MealItem createMealItem(
             String food,
-            String quantity,
+            Double quantity,
+            String quantityUnit,
             double calories,
             double protein,
             double carbs,
@@ -57,13 +64,16 @@ class MealAnalysisResponseTest {
             double fiber
     ) {
         MealItem item = new MealItem();
+
         item.setFood(food);
         item.setQuantity(quantity);
+        item.setQuantityUnit(quantityUnit);
         item.setCalories(calories);
         item.setProtein(protein);
         item.setCarbs(carbs);
         item.setFat(fat);
         item.setFiber(fiber);
+
         return item;
     }
 }

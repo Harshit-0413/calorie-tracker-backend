@@ -1,24 +1,22 @@
 package com.calorietracker.controller;
 
-import com.calorietracker.exception.GlobalExceptionHandler;
-import com.calorietracker.service.AiService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.test.web.servlet.MockMvc;
 import com.calorietracker.dto.MealAnalysisResponse;
 import com.calorietracker.dto.MealItem;
 import com.calorietracker.exception.ClaudeApiException;
-
-import static org.mockito.Mockito.when;
+import com.calorietracker.exception.GlobalExceptionHandler;
+import com.calorietracker.service.AiService;
+import com.calorietracker.service.MealService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.mockito.Mockito.when;
-
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,11 +28,14 @@ class AiControllerTest {
     @Mock
     private AiService aiService;
 
+    @Mock
+    private MealService mealService;
+
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        AiController aiController = new AiController(aiService);
+        AiController aiController = new AiController(aiService, mealService);
 
         mockMvc = standaloneSetup(aiController)
                 .setControllerAdvice(new GlobalExceptionHandler())
@@ -55,7 +56,8 @@ class AiControllerTest {
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error", is("Validation failed")))
-                .andExpect(jsonPath("$.message", is("Meal description cannot be empty")));
+                .andExpect(jsonPath("$.message",
+                        is("Meal description cannot be empty")));
     }
 
     @Test
@@ -63,12 +65,15 @@ class AiControllerTest {
 
         MealItem item = new MealItem();
         item.setFood("Poha");
-        item.setQuantity("2 plates");
+        item.setQuantity(2.0);
+        item.setQuantityUnit("plates");
+        item.setEstimated(false);
         item.setCalories(450);
         item.setProtein(10);
         item.setCarbs(70);
         item.setFat(15);
         item.setFiber(6);
+        item.setSugar(4.0);
 
         MealAnalysisResponse response = new MealAnalysisResponse();
         response.setItems(List.of(item));
@@ -87,18 +92,23 @@ class AiControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.items[0].food", is("Poha")))
-                .andExpect(jsonPath("$.items[0].quantity", is("2 plates")))
+                .andExpect(jsonPath("$.items[0].quantity", is(2.0)))
+                .andExpect(jsonPath("$.items[0].quantityUnit", is("plates")))
+                .andExpect(jsonPath("$.items[0].estimated", is(false)))
                 .andExpect(jsonPath("$.items[0].calories", is(450.0)))
                 .andExpect(jsonPath("$.items[0].protein", is(10.0)))
                 .andExpect(jsonPath("$.items[0].carbs", is(70.0)))
                 .andExpect(jsonPath("$.items[0].fat", is(15.0)))
                 .andExpect(jsonPath("$.items[0].fiber", is(6.0)))
+                .andExpect(jsonPath("$.items[0].sugar", is(4.0)))
                 .andExpect(jsonPath("$.totalCalories", is(450.0)))
                 .andExpect(jsonPath("$.totalProtein", is(10.0)))
                 .andExpect(jsonPath("$.totalCarbs", is(70.0)))
                 .andExpect(jsonPath("$.totalFat", is(15.0)))
-                .andExpect(jsonPath("$.totalFiber", is(6.0)));
+                .andExpect(jsonPath("$.totalFiber", is(6.0)))
+                .andExpect(jsonPath("$.totalSugar", is(4.0)));
     }
+
     @Test
     void shouldReturnBadGatewayWhenClaudeApiFails() throws Exception {
 
@@ -109,13 +119,15 @@ class AiControllerTest {
                         post("/api/ai/parse-meal")
                                 .contentType("application/json")
                                 .content("""
-                            {
-                              "prompt": "Poha"
-                            }
-                            """)
+                                        {
+                                          "prompt": "Poha"
+                                        }
+                                        """)
                 )
                 .andExpect(status().isBadGateway())
-                .andExpect(jsonPath("$.error", is("Claude API request failed")))
-                .andExpect(jsonPath("$.message", is("Claude API failed")));
+                .andExpect(jsonPath("$.error",
+                        is("Claude API request failed")))
+                .andExpect(jsonPath("$.message",
+                        is("Claude API failed")));
     }
 }

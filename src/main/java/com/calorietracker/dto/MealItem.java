@@ -1,14 +1,19 @@
+
 package com.calorietracker.dto;
 
 public class MealItem {
 
     private String food;
-    private String quantity;
+    private Double quantity;
+    private String quantityUnit;
+    private boolean estimated;
+
     private double calories;
     private double protein;
     private double carbs;
     private double fat;
     private double fiber;
+    private Double sugar;
 
     public MealItem() {
     }
@@ -21,12 +26,28 @@ public class MealItem {
         this.food = food;
     }
 
-    public String getQuantity() {
+    public Double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(String quantity) {
+    public void setQuantity(Double quantity) {
         this.quantity = quantity;
+    }
+
+    public String getQuantityUnit() {
+        return quantityUnit;
+    }
+
+    public void setQuantityUnit(String quantityUnit) {
+        this.quantityUnit = quantityUnit;
+    }
+
+    public boolean isEstimated() {
+        return estimated;
+    }
+
+    public void setEstimated(boolean estimated) {
+        this.estimated = estimated;
     }
 
     public double getCalories() {
@@ -69,16 +90,33 @@ public class MealItem {
         this.fiber = fiber;
     }
 
+    public Double getSugar() {
+        return sugar;
+    }
+
+    public void setSugar(Double sugar) {
+        this.sugar = sugar;
+    }
+
     public boolean hasValidNutrition() {
         return food != null
                 && !food.isBlank()
                 && quantity != null
-                && !quantity.isBlank()
+                && Double.isFinite(quantity)
+                && quantity > 0
+                && quantityUnit != null
+                && !quantityUnit.isBlank()
+                && Double.isFinite(calories)
+                && Double.isFinite(protein)
+                && Double.isFinite(carbs)
+                && Double.isFinite(fat)
+                && Double.isFinite(fiber)
+                && Double.isFinite(sugar)
                 && calories >= 0
                 && protein >= 0
                 && carbs >= 0
                 && fat >= 0
-                && fiber >= 0;
+                && fiber >= 0
+                && sugar >= 0;
     }
-
 }

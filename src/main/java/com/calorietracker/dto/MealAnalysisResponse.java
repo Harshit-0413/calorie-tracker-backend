@@ -1,8 +1,10 @@
+
 package com.calorietracker.dto;
 
 import java.util.List;
 
 public class MealAnalysisResponse {
+
     private List<MealItem> items;
 
     public MealAnalysisResponse() {
@@ -15,16 +17,19 @@ public class MealAnalysisResponse {
     public void setItems(List<MealItem> items) {
         this.items = items;
     }
+
     public double getTotalCalories() {
         return items.stream()
                 .mapToDouble(MealItem::getCalories)
                 .sum();
     }
-    public double getTotalProtein(){
+
+    public double getTotalProtein() {
         return items.stream()
                 .mapToDouble(MealItem::getProtein)
                 .sum();
     }
+
     public double getTotalCarbs() {
         return items.stream()
                 .mapToDouble(MealItem::getCarbs)
@@ -40,6 +45,12 @@ public class MealAnalysisResponse {
     public double getTotalFiber() {
         return items.stream()
                 .mapToDouble(MealItem::getFiber)
+                .sum();
+    }
+
+    public double getTotalSugar() {
+        return items.stream()
+                .mapToDouble(MealItem::getSugar)
                 .sum();
     }
 }
